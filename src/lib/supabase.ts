@@ -4,9 +4,11 @@ import { Database } from '../types/database';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+export const isDemoMode = !supabaseUrl || !supabaseAnonKey;
+
 let supabase;
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (isDemoMode) {
   console.warn('Supabase environment variables not configured. Using demo mode.');
   // For demo purposes, we'll use placeholder values
   const demoUrl = 'https://demo.supabase.co';

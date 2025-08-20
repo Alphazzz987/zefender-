@@ -20,6 +20,7 @@ import RefillManagement from './components/Refill/RefillManagement';
 import RazorpayIntegration from './components/Payments/RazorpayIntegration';
 import { 
   supabase, 
+  isDemoMode,
   getAllKiosks,
   getAllCustomers,
   getAllNotifications,
@@ -35,6 +36,7 @@ import {
 } from './lib/supabase';
 import { reviveDates } from './utils/dateUtils';
 import { Kiosk, Notification, Payment, RefundRequest, Customer, MaintenanceRequest } from './types';
+import { mockKiosks, mockCustomers, mockNotifications } from './data/mockData';
 
 function App() {
   const [userRole, setUserRole] = useState<'admin' | 'customer'>('admin');
@@ -59,17 +61,28 @@ function App() {
   useEffect(() => {
     // Add error handling for demo mode
     const initializeApp = async () => {
-      try {
-        await fetchAllData();
-      } catch (error) {
-        console.warn('Database connection failed, running in demo mode:', error);
-        // Load mock data for demo
-        setKiosks([]);
-        setCustomers([]);
-        setNotifications([]);
-        setPayments([]);
-        setMaintenanceRequests([]);
+      if (isDemoMode) {
+        console.log('Running in demo mode with mock data');
+        // Load mock data directly
+        setKiosks(mockKiosks);
+        setCustomers(mockCustomers);
+        setNotifications(mockNotifications);
+        setPayments(mockKiosks.flatMap(k => k.payments || []));
+        setMaintenanceRequests(mockKiosks.flatMap(k => k.maintenanceRequests || []));
         setIsLoading(false);
+      } else {
+        try {
+          await fetchAllData();
+        } catch (error) {
+          console.warn('Database connection failed, falling back to demo mode:', error);
+          // Load mock data for demo
+          setKiosks(mockKiosks);
+          setCustomers(mockCustomers);
+          setNotifications(mockNotifications);
+          setPayments(mockKiosks.flatMap(k => k.payments || []));
+          setMaintenanceRequests(mockKiosks.flatMap(k => k.maintenanceRequests || []));
+          setIsLoading(false);
+        }
       }
     };
     
