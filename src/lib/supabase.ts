@@ -4,20 +4,24 @@ import { Database } from '../types/database';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+let supabase;
+
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Supabase environment variables not configured. Using demo mode.');
   // For demo purposes, we'll use placeholder values
   const demoUrl = 'https://demo.supabase.co';
   const demoKey = 'demo_key';
   
-  export const supabase = createClient<Database>(demoUrl, demoKey, {
+  supabase = createClient<Database>(demoUrl, demoKey, {
     auth: {
       persistSession: false
     }
   });
 } else {
-  export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+  supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 }
+
+export { supabase };
 
 // Custom authentication for admin and customer tables
 export const signInWithCustomAuth = async (email: string, password: string, userType: 'admin' | 'customer') => {
