@@ -57,7 +57,23 @@ function App() {
   };
 
   useEffect(() => {
-    fetchAllData();
+    // Add error handling for demo mode
+    const initializeApp = async () => {
+      try {
+        await fetchAllData();
+      } catch (error) {
+        console.warn('Database connection failed, running in demo mode:', error);
+        // Load mock data for demo
+        setKiosks([]);
+        setCustomers([]);
+        setNotifications([]);
+        setPayments([]);
+        setMaintenanceRequests([]);
+        setIsLoading(false);
+      }
+    };
+    
+    initializeApp();
   }, [userRole]);
 
   const fetchAllData = async () => {
